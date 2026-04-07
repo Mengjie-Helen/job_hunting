@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:careers.airbnb.com)",
+      "WebFetch(domain:job-boards.greenhouse.io)",
+      "WebFetch(domain:startup.jobs)",
+      "WebFetch(domain:jobright.ai)",
+      "WebFetch(domain:jobs.lever.co)",
+      "WebFetch(domain:www.metacareers.com)",
+      "WebFetch(domain:stripe.com)",
+      "WebFetch(domain:microsoft.ai)",
+      "WebFetch(domain:jobs.careers.microsoft.com)",
+      "WebFetch(domain:boards.greenhouse.io)",
+      "WebFetch(domain:www.klaviyo.com)",
+      "WebFetch(domain:www.builtinsf.com)",
+      "WebFetch(domain:openai.com)",
+      "WebFetch(domain:www.uber.com)",
+      "WebFetch(domain:www.google.com)",
+      "WebFetch(domain:www.amazon.jobs)",
+      "WebFetch(domain:www.glassdoor.com)",
+      "WebFetch(domain:jobs.apple.com)",
+      "WebFetch(domain:www.remoterocketship.com)",
+      "WebFetch(domain:experimentationjobs.com)",
+      "WebFetch(domain:www.ziprecruiter.com)",
+      "WebFetch(domain:careersatdoordash.com)",
+      "WebFetch(domain:jobs.technyc.org)",
+      "WebFetch(domain:jobs.weekday.works)",
+      "Bash(git init:*)",
+      "Bash(git remote:*)",
+      "Bash(git pull:*)",
+      "Bash(git branch:*)",
+      "Bash(git fetch:*)",
+      "Bash(git merge:*)",
+      "Bash(git add:*)",
+      "Bash(git stash:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}
