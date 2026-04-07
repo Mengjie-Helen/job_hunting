@@ -74,6 +74,7 @@ Rules:
 Get today's date (YYYY-MM-DD).
 
 ### 1. Markdown: `daily_jobs/YYYY-MM-DD.md`
+A daily snapshot for human readability.
 ```
 # Daily Job Listings — YYYY-MM-DD
 _Target: Data Scientist / Experimentation / Product Analytics | L4/L5 | $180k+ TC_
@@ -82,28 +83,37 @@ _Window: 3pm ET YYYY-MM-DD (yesterday) → 3pm ET YYYY-MM-DD (today)_
 ## East Coast (NY · DC · Boston · Miami)
 | Job Title | Company | Location | Salary Range | Date Posted | Application Link | Why It Matches | Pull Date |
 |---|---|---|---|---|---|---|---|
-[rows or 'no new positions' message]
+[rows or '_No new matching positions found in this window._']
 
 ## West Coast (SF · Seattle · LA · Remote)
 | Job Title | Company | Location | Salary Range | Date Posted | Application Link | Why It Matches | Pull Date |
 |---|---|---|---|---|---|---|---|
-[rows or 'no new positions' message]
+[rows or '_No new matching positions found in this window._']
 
 ---
-*Duplicates removed against last 3 daily reports.*
+*Duplicates removed against all_jobs.csv.*
 *Searched: Meta, Google, Amazon, Apple, Netflix, Airbnb, Uber, Lyft, Spotify, Stripe, OpenAI, Anthropic, Databricks, DoorDash, Instacart, Cohere, Scale AI, Palantir, TikTok, HubSpot, Wayfair, Klaviyo, Toast, Robinhood, Duolingo, Microsoft*
 ```
 
-### 2. CSV: `daily_jobs/YYYY-MM-DD.csv`
+### 2. CSV: `daily_jobs/all_jobs.csv` (append, do not overwrite)
+All jobs across all days are stored in a single cumulative sheet. The Pull Date column identifies when each batch was pulled.
+
+Steps:
+1. Check if `daily_jobs/all_jobs.csv` exists using Glob
+2. If it does NOT exist: create it with the header row first, then append today's rows
+3. If it DOES exist: append today's rows only (no header — header already exists)
+4. For deduplication: read `all_jobs.csv` and skip any job whose Application Link OR (Job Title + Company) already appears in the file
+
+CSV format:
 ```
 Job Title,Company,Location,Salary Range,Date Posted,Application Link,Why It Matches,Pull Date
-[one row per job, all fields comma-separated, text fields quoted if they contain commas]
+[one row per new job — quote any field that contains a comma]
 ```
 
-Create the `daily_jobs/` directory if it doesn't exist. After writing both files, run:
+Create `daily_jobs/` if it doesn't exist. After writing both files, run:
 ```
 git add daily_jobs/
 git commit -m 'Add daily job listings YYYY-MM-DD'
 git push
 ```
-If git push fails due to auth, that is okay — the file content is still visible in this run log.
+If git push fails due to auth, that is okay — results are visible in this run log.
