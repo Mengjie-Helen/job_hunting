@@ -95,7 +95,7 @@ _Window: 3pm ET YYYY-MM-DD (yesterday) → 3pm ET YYYY-MM-DD (today)_
 *Searched: Meta, Google, Amazon, Apple, Netflix, Airbnb, Uber, Lyft, Spotify, Stripe, OpenAI, Anthropic, Databricks, DoorDash, Instacart, Cohere, Scale AI, Palantir, TikTok, HubSpot, Wayfair, Klaviyo, Toast, Robinhood, Duolingo, Microsoft*
 ```
 
-### 2. CSV: `daily_jobs/all_jobs.csv` (append, do not overwrite)
+### 2. CSV: `daily_jobs/all_jobs.csv` (APPEND then SORT — do not overwrite)
 All jobs across all days are stored in a single cumulative sheet. The Pull Date column identifies when each batch was pulled.
 
 Steps:
@@ -103,6 +103,34 @@ Steps:
 2. If it does NOT exist: create it with the header row first, then append today's rows
 3. If it DOES exist: append today's rows only (no header — header already exists)
 4. For deduplication: read `all_jobs.csv` and skip any job whose Application Link OR (Job Title + Company) already appears in the file
+5. After appending, re-sort the entire file and write it back:
+   - Primary sort: Pull Date descending
+   - Secondary sort: Date Posted descending (parse month/year; treat 'Unknown', 'Not listed', 'Active YYYY' as lowest priority)
+
+Use this Python snippet to sort:
+```python
+import csv
+from datetime import datetime
+
+def parse_date(s):
+    s = (s or '').strip()
+    if s in ('', 'Not listed', 'Unknown'): return (0, 0)
+    for fmt, fn in [('%Y-%m-%d', lambda d:(d.year*12+d.month,d.day)),
+                    ('%b %Y',    lambda d:(d.year*12+d.month,0)),
+                    ('%B %Y',    lambda d:(d.year*12+d.month,0))]:
+        try: return fn(datetime.strptime(s, fmt))
+        except: pass
+    if s.startswith('Active'):
+        try: return (int(s.split()[-1])*12, 0)
+        except: pass
+    return (0, 0)
+
+with open('daily_jobs/all_jobs.csv', newline='', encoding='utf-8') as f:
+    reader = csv.DictReader(f); rows = list(reader); fields = reader.fieldnames
+rows.sort(key=lambda r: (r.get('Pull Date',''), parse_date(r.get('Date Posted',''))), reverse=True)
+with open('daily_jobs/all_jobs.csv', 'w', newline='', encoding='utf-8') as f:
+    w = csv.DictWriter(f, fieldnames=fields); w.writeheader(); w.writerows(rows)
+```
 
 CSV format:
 ```
