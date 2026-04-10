@@ -33,18 +33,21 @@
       gap: 24px;
       font-size: 12px;
       color: #64748b;
+      flex-wrap: wrap;
     }
     #stats b { color: #1a1a2e; }
 
     #controls {
       padding: 12px 24px;
       display: flex;
-      gap: 10px;
+      gap: 8px;
       align-items: center;
       background: #f5f7fa;
+      flex-wrap: wrap;
     }
+    #controls span { font-size: 12px; color: #64748b; margin-right: 4px; }
     #controls button {
-      padding: 6px 14px;
+      padding: 5px 12px;
       border: 1px solid #e2e8f0;
       border-radius: 6px;
       background: white;
@@ -54,11 +57,11 @@
     }
     #controls button:hover { background: #f1f5f9; }
     #controls button.active { background: #1a1a2e; color: white; border-color: #1a1a2e; }
+    #controls .clear-btn { margin-left: auto; color: #ef4444; border-color: #fecaca; }
+    #controls .clear-btn:hover { background: #fef2f2; }
 
-    .table-wrap {
-      overflow-x: auto;
-      padding: 0 24px 24px;
-    }
+    /* ── Table ── */
+    .table-wrap { overflow-x: auto; padding: 0 24px 24px; }
 
     table {
       width: 100%;
@@ -79,41 +82,119 @@
       white-space: nowrap;
     }
 
+    /* ── Multi-select dropdown filter ── */
     .filter-row th {
       background: #f8fafc;
-      padding: 6px 8px;
+      padding: 5px 6px;
+      position: relative;
     }
-    .filter-row input, .filter-row select {
+
+    .dd-wrap { position: relative; }
+
+    .dd-btn {
       width: 100%;
+      padding: 5px 24px 5px 8px;
+      border: 1px solid #e2e8f0;
+      border-radius: 5px;
+      background: white;
+      font-size: 11px;
+      color: #475569;
+      cursor: pointer;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      position: relative;
+    }
+    .dd-btn::after {
+      content: '▾';
+      position: absolute;
+      right: 7px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 10px;
+      color: #94a3b8;
+    }
+    .dd-btn.has-selection {
+      border-color: #6366f1;
+      color: #4f46e5;
+      background: #eef2ff;
+    }
+
+    .dd-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 2px);
+      left: 0;
+      min-width: 180px;
+      max-width: 260px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 7px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      z-index: 100;
+      padding: 4px 0;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+    .dd-menu.open { display: block; }
+
+    .dd-search {
+      width: calc(100% - 12px);
+      margin: 6px;
       padding: 5px 8px;
       border: 1px solid #e2e8f0;
       border-radius: 5px;
-      font-size: 12px;
-      background: white;
-      color: #1a1a2e;
-    }
-    .filter-row input:focus, .filter-row select:focus {
+      font-size: 11px;
       outline: none;
-      border-color: #6366f1;
     }
+    .dd-search:focus { border-color: #6366f1; }
 
+    .dd-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-size: 12px;
+      color: #374151;
+      white-space: nowrap;
+    }
+    .dd-item:hover { background: #f8fafc; }
+    .dd-item input[type=checkbox] { cursor: pointer; accent-color: #6366f1; }
+    .dd-item.checked { color: #4f46e5; font-weight: 500; }
+
+    .dd-actions {
+      display: flex;
+      gap: 6px;
+      padding: 5px 8px 6px;
+      border-top: 1px solid #f1f5f9;
+    }
+    .dd-actions button {
+      flex: 1;
+      padding: 4px;
+      font-size: 11px;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      background: white;
+      cursor: pointer;
+      color: #64748b;
+    }
+    .dd-actions button:hover { background: #f1f5f9; }
+
+    /* ── Rows ── */
     tbody tr { border-bottom: 1px solid #f1f5f9; }
     tbody tr:hover { background: #f8fafc; }
     tbody tr.hidden { display: none; }
 
-    td {
-      padding: 10px 12px;
-      vertical-align: top;
-      line-height: 1.4;
-    }
-
-    td.title { font-weight: 500; min-width: 180px; }
-    td.company { font-weight: 600; color: #4f46e5; min-width: 100px; }
-    td.location { min-width: 130px; color: #475569; }
-    td.salary { min-width: 120px; color: #059669; font-weight: 500; }
-    td.date-posted { min-width: 90px; color: #94a3b8; }
-    td.pull-date { min-width: 90px; color: #94a3b8; }
-    td.why { min-width: 200px; max-width: 260px; color: #475569; font-size: 12px; }
+    td { padding: 10px 12px; vertical-align: top; line-height: 1.4; }
+    td.title      { font-weight: 500; min-width: 180px; }
+    td.company    { font-weight: 600; color: #4f46e5; min-width: 100px; }
+    td.location   { min-width: 130px; color: #475569; }
+    td.salary     { min-width: 120px; color: #059669; font-weight: 500; }
+    td.date-posted{ min-width: 90px; color: #94a3b8; }
+    td.pull-date  { min-width: 90px; color: #94a3b8; }
+    td.why        { min-width: 200px; max-width: 260px; color: #475569; font-size: 12px; }
 
     td.link a {
       display: inline-block;
@@ -138,27 +219,17 @@
       min-width: 120px;
     }
 
-    /* status color coding */
-    select.s-applied     { border-color: #6366f1; color: #4f46e5; background: #eef2ff; }
-    select.s-phone       { border-color: #f59e0b; color: #d97706; background: #fffbeb; }
-    select.s-interviewing{ border-color: #3b82f6; color: #2563eb; background: #eff6ff; }
-    select.s-offer       { border-color: #10b981; color: #059669; background: #ecfdf5; }
-    select.s-declined    { border-color: #ef4444; color: #dc2626; background: #fef2f2; }
-    select.s-rejected    { border-color: #9ca3af; color: #6b7280; background: #f9fafb; }
+    /* status colors */
+    select.s-applied      { border-color: #6366f1; color: #4f46e5; background: #eef2ff; }
+    select.s-phone        { border-color: #f59e0b; color: #d97706; background: #fffbeb; }
+    select.s-interviewing { border-color: #3b82f6; color: #2563eb; background: #eff6ff; }
+    select.s-offer        { border-color: #10b981; color: #059669; background: #ecfdf5; }
+    select.s-declined     { border-color: #ef4444; color: #dc2626; background: #fef2f2; }
+    select.s-rejected     { border-color: #9ca3af; color: #6b7280; background: #f9fafb; }
+    select.s-not-fit      { border-color: #f97316; color: #ea580c; background: #fff7ed; }
 
-    #loading {
-      text-align: center;
-      padding: 60px;
-      color: #94a3b8;
-      font-size: 14px;
-    }
-
-    #no-results {
-      text-align: center;
-      padding: 40px;
-      color: #94a3b8;
-      display: none;
-    }
+    #loading { text-align: center; padding: 60px; color: #94a3b8; font-size: 14px; }
+    #no-results { text-align: center; padding: 40px; color: #94a3b8; display: none; }
   </style>
 </head>
 <body>
@@ -177,7 +248,7 @@
 </div>
 
 <div id="controls">
-  <span style="font-size:12px;color:#64748b;margin-right:4px;">Filter by status:</span>
+  <span>Filter by status:</span>
   <button class="active" onclick="filterStatus('all', this)">All</button>
   <button onclick="filterStatus('not applied', this)">Not Applied</button>
   <button onclick="filterStatus('applied', this)">Applied</button>
@@ -186,7 +257,8 @@
   <button onclick="filterStatus('offer received', this)">Offer</button>
   <button onclick="filterStatus('declined', this)">Declined</button>
   <button onclick="filterStatus('rejected', this)">Rejected</button>
-  <button onclick="clearAllFilters()" style="margin-left:auto;">Clear Filters</button>
+  <button onclick="filterStatus('not fit', this)">Not Fit</button>
+  <button class="clear-btn" onclick="clearAllFilters()">✕ Clear All Filters</button>
 </div>
 
 <div class="table-wrap">
@@ -206,16 +278,10 @@
         <th>Pull Date</th>
         <th>Status</th>
       </tr>
-      <tr class="filter-row">
-        <th><input type="text" placeholder="Filter…" oninput="applyFilters()" id="f-title" /></th>
-        <th><input type="text" placeholder="Filter…" oninput="applyFilters()" id="f-company" /></th>
-        <th><input type="text" placeholder="Filter…" oninput="applyFilters()" id="f-location" /></th>
-        <th><input type="text" placeholder="Filter…" oninput="applyFilters()" id="f-salary" /></th>
-        <th><input type="text" placeholder="Filter…" oninput="applyFilters()" id="f-date-posted" /></th>
-        <th></th>
-        <th><input type="text" placeholder="Filter…" oninput="applyFilters()" id="f-why" /></th>
-        <th><input type="text" placeholder="Filter…" oninput="applyFilters()" id="f-pull-date" /></th>
-        <th></th>
+      <tr class="filter-row" id="filter-row">
+        <!-- dropdowns injected by JS after data loads -->
+        <th></th><th></th><th></th><th></th><th></th>
+        <th></th><th></th><th></th><th></th>
       </tr>
     </thead>
     <tbody id="job-body"></tbody>
@@ -225,57 +291,200 @@
 <script>
 const CSV_URL = 'https://raw.githubusercontent.com/Mengjie-Helen/job_hunting/main/daily_jobs/all_jobs.csv';
 const STORAGE_KEY = 'job_statuses';
-const STATUS_OPTIONS = ['Not Applied', 'Applied', 'Phone Screen', 'Interviewing', 'Offer Received', 'Declined', 'Rejected'];
+const STATUS_OPTIONS = ['Not Applied','Applied','Phone Screen','Interviewing','Offer Received','Declined','Rejected','Not Fit'];
 const STATUS_CLASS = {
-  'applied': 's-applied',
-  'phone screen': 's-phone',
-  'interviewing': 's-interviewing',
-  'offer received': 's-offer',
-  'declined': 's-declined',
-  'rejected': 's-rejected',
+  'applied':       's-applied',
+  'phone screen':  's-phone',
+  'interviewing':  's-interviewing',
+  'offer received':'s-offer',
+  'declined':      's-declined',
+  'rejected':      's-rejected',
+  'not fit':       's-not-fit',
 };
+
+// column config: [label, dataset key, csv key]
+const FILTER_COLS = [
+  ['Job Title',    'title',      'Job Title'],
+  ['Company',      'company',    'Company'],
+  ['Location',     'location',   'Location'],
+  ['Salary Range', 'salary',     'Salary Range'],
+  ['Date Posted',  'datePosted', 'Date Posted'],
+  [null,           null,         null],        // Apply — no filter
+  ['Why It Matches','why',       'Why It Matches'],
+  ['Pull Date',    'pullDate',   'Pull Date'],
+  [null,           null,         null],        // Status — handled by top buttons
+];
 
 let allRows = [];
 let activeStatusFilter = 'all';
+// selectedValues[colKey] = Set of selected values (empty = all)
+const selectedValues = {};
 
-// --- CSV parser ---
+/* ── CSV parser ── */
 function parseCSV(text) {
   const lines = text.trim().split('\n');
   const headers = parseCSVLine(lines[0]);
-  return lines.slice(1).map(line => {
+  return lines.slice(1).filter(l => l.trim()).map(line => {
     const vals = parseCSVLine(line);
     const obj = {};
     headers.forEach((h, i) => obj[h.trim()] = (vals[i] || '').trim());
     return obj;
   });
 }
-
 function parseCSVLine(line) {
-  const result = [];
-  let cur = '', inQuotes = false;
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
-    if (ch === '"') { inQuotes = !inQuotes; }
-    else if (ch === ',' && !inQuotes) { result.push(cur); cur = ''; }
-    else { cur += ch; }
+  const result = []; let cur = '', inQ = false;
+  for (const ch of line) {
+    if (ch === '"') inQ = !inQ;
+    else if (ch === ',' && !inQ) { result.push(cur); cur = ''; }
+    else cur += ch;
   }
   result.push(cur);
   return result;
 }
 
-// --- Status persistence ---
+/* ── Status persistence ── */
 function getStatuses() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; }
 }
-function saveStatus(key, value) {
-  const s = getStatuses(); s[key] = value;
+function saveStatus(key, val) {
+  const s = getStatuses(); s[key] = val;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
 }
 function getStatusKey(row) {
   return (row['Application Link'] || '') + '||' + (row['Job Title'] || '');
 }
 
-// --- Render ---
+/* ── Build dropdown filters ── */
+function buildFilters() {
+  const filterRow = document.getElementById('filter-row');
+  const cells = filterRow.querySelectorAll('th');
+
+  FILTER_COLS.forEach(([label, colKey, csvKey], i) => {
+    const th = cells[i];
+    th.innerHTML = '';
+    if (!colKey) return; // Apply / Status columns
+
+    // collect unique values for this column
+    const vals = [...new Set(allRows.map(r => (r[csvKey] || '').trim()))].filter(Boolean).sort();
+    selectedValues[colKey] = selectedValues[colKey] || new Set();
+
+    const wrap = document.createElement('div');
+    wrap.className = 'dd-wrap';
+
+    const btn = document.createElement('button');
+    btn.className = 'dd-btn';
+    btn.id = `dd-btn-${colKey}`;
+    btn.textContent = label;
+    btn.onclick = (e) => { e.stopPropagation(); toggleMenu(colKey); };
+
+    const menu = document.createElement('div');
+    menu.className = 'dd-menu';
+    menu.id = `dd-menu-${colKey}`;
+
+    // search box inside dropdown
+    const search = document.createElement('input');
+    search.className = 'dd-search';
+    search.placeholder = 'Search…';
+    search.oninput = () => filterMenuItems(colKey, search.value);
+    menu.appendChild(search);
+
+    // items
+    const itemsDiv = document.createElement('div');
+    itemsDiv.id = `dd-items-${colKey}`;
+    vals.forEach(val => {
+      const item = document.createElement('label');
+      item.className = 'dd-item';
+      item.dataset.val = val.toLowerCase();
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.value = val;
+      cb.checked = selectedValues[colKey].has(val.toLowerCase());
+      if (cb.checked) item.classList.add('checked');
+      cb.onchange = () => onCheckChange(colKey, val.toLowerCase(), cb.checked, item);
+      item.appendChild(cb);
+      item.appendChild(document.createTextNode(val));
+      itemsDiv.appendChild(item);
+    });
+    menu.appendChild(itemsDiv);
+
+    // Select all / Clear actions
+    const actions = document.createElement('div');
+    actions.className = 'dd-actions';
+    const selAll = document.createElement('button');
+    selAll.textContent = 'Select all';
+    selAll.onclick = () => selectAllInMenu(colKey);
+    const clearBtn = document.createElement('button');
+    clearBtn.textContent = 'Clear';
+    clearBtn.onclick = () => clearMenu(colKey);
+    actions.appendChild(selAll);
+    actions.appendChild(clearBtn);
+    menu.appendChild(actions);
+
+    wrap.appendChild(btn);
+    wrap.appendChild(menu);
+    th.appendChild(wrap);
+  });
+}
+
+function toggleMenu(colKey) {
+  document.querySelectorAll('.dd-menu').forEach(m => {
+    if (m.id !== `dd-menu-${colKey}`) m.classList.remove('open');
+  });
+  document.getElementById(`dd-menu-${colKey}`).classList.toggle('open');
+}
+
+function filterMenuItems(colKey, query) {
+  const q = query.toLowerCase();
+  document.querySelectorAll(`#dd-items-${colKey} .dd-item`).forEach(item => {
+    item.style.display = item.dataset.val.includes(q) ? '' : 'none';
+  });
+}
+
+function onCheckChange(colKey, val, checked, item) {
+  if (checked) selectedValues[colKey].add(val);
+  else selectedValues[colKey].delete(val);
+  item.classList.toggle('checked', checked);
+  updateBtnLabel(colKey);
+  applyFilters();
+}
+
+function selectAllInMenu(colKey) {
+  document.querySelectorAll(`#dd-items-${colKey} .dd-item`).forEach(item => {
+    const cb = item.querySelector('input');
+    if (item.style.display !== 'none' && !cb.checked) {
+      cb.checked = true;
+      selectedValues[colKey].add(item.dataset.val);
+      item.classList.add('checked');
+    }
+  });
+  updateBtnLabel(colKey);
+  applyFilters();
+}
+
+function clearMenu(colKey) {
+  document.querySelectorAll(`#dd-items-${colKey} .dd-item input`).forEach(cb => {
+    cb.checked = false;
+    cb.closest('.dd-item').classList.remove('checked');
+  });
+  selectedValues[colKey].clear();
+  updateBtnLabel(colKey);
+  applyFilters();
+}
+
+function updateBtnLabel(colKey) {
+  const btn = document.getElementById(`dd-btn-${colKey}`);
+  const label = FILTER_COLS.find(c => c[1] === colKey)?.[0] || colKey;
+  const count = selectedValues[colKey].size;
+  btn.textContent = count > 0 ? `${label} (${count})` : label;
+  btn.classList.toggle('has-selection', count > 0);
+}
+
+// close menus on outside click
+document.addEventListener('click', () => {
+  document.querySelectorAll('.dd-menu').forEach(m => m.classList.remove('open'));
+});
+
+/* ── Render table rows ── */
 function render(rows) {
   const tbody = document.getElementById('job-body');
   const statuses = getStatuses();
@@ -295,14 +504,10 @@ function render(rows) {
     tr.dataset.why        = (row['Why It Matches'] || '').toLowerCase();
     tr.dataset.pullDate   = (row['Pull Date'] || '').toLowerCase();
     tr.dataset.status     = status;
-    tr.dataset.key        = key;
 
     const link = row['Application Link'] || '';
-    const linkCell = link
-      ? `<a href="${link}" target="_blank" rel="noopener">Apply ↗</a>`
-      : '—';
+    const linkCell = link ? `<a href="${link}" target="_blank" rel="noopener">Apply ↗</a>` : '—';
 
-    // build status dropdown
     const opts = STATUS_OPTIONS.map(o =>
       `<option value="${o}" ${o.toLowerCase() === status ? 'selected' : ''}>${o}</option>`
     ).join('');
@@ -316,7 +521,7 @@ function render(rows) {
       <td class="link">${linkCell}</td>
       <td class="why">${row['Why It Matches'] || ''}</td>
       <td class="pull-date">${row['Pull Date'] || ''}</td>
-      <td class="status"><select class="${statusClass}" onchange="onStatusChange(this, '${key}')">${opts}</select></td>
+      <td class="status"><select class="${statusClass}" onchange="onStatusChange(this, '${key.replace(/'/g,"\\'")}'">${opts}</select></td>
     `;
     tbody.appendChild(tr);
   });
@@ -328,37 +533,24 @@ function onStatusChange(sel, key) {
   const val = sel.value;
   saveStatus(key, val);
   sel.className = STATUS_CLASS[val.toLowerCase()] || '';
-  const tr = sel.closest('tr');
-  tr.dataset.status = val.toLowerCase();
+  sel.closest('tr').dataset.status = val.toLowerCase();
   applyFilters();
 }
 
-// --- Filters ---
+/* ── Apply all filters ── */
 function applyFilters() {
-  const f = {
-    title:      document.getElementById('f-title').value.toLowerCase(),
-    company:    document.getElementById('f-company').value.toLowerCase(),
-    location:   document.getElementById('f-location').value.toLowerCase(),
-    salary:     document.getElementById('f-salary').value.toLowerCase(),
-    datePosted: document.getElementById('f-date-posted').value.toLowerCase(),
-    why:        document.getElementById('f-why').value.toLowerCase(),
-    pullDate:   document.getElementById('f-pull-date').value.toLowerCase(),
-  };
-
   let visibleCount = 0;
   document.querySelectorAll('#job-body tr').forEach(tr => {
-    const matchesText =
-      tr.dataset.title.includes(f.title) &&
-      tr.dataset.company.includes(f.company) &&
-      tr.dataset.location.includes(f.location) &&
-      tr.dataset.salary.includes(f.salary) &&
-      tr.dataset.datePosted.includes(f.datePosted) &&
-      tr.dataset.why.includes(f.why) &&
-      tr.dataset.pullDate.includes(f.pullDate);
+    // dropdown column filters (OR within column)
+    const colMatch = FILTER_COLS.every(([, colKey]) => {
+      if (!colKey) return true;
+      const sel = selectedValues[colKey];
+      if (!sel || sel.size === 0) return true;
+      return sel.has(tr.dataset[colKey]);
+    });
 
-    const matchesStatus = activeStatusFilter === 'all' || tr.dataset.status === activeStatusFilter;
-
-    const visible = matchesText && matchesStatus;
+    const statusMatch = activeStatusFilter === 'all' || tr.dataset.status === activeStatusFilter;
+    const visible = colMatch && statusMatch;
     tr.classList.toggle('hidden', !visible);
     if (visible) visibleCount++;
   });
@@ -369,25 +561,33 @@ function applyFilters() {
 
 function filterStatus(status, btn) {
   activeStatusFilter = status;
-  document.querySelectorAll('#controls button').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#controls button:not(.clear-btn)').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   applyFilters();
 }
 
 function clearAllFilters() {
-  ['f-title','f-company','f-location','f-salary','f-date-posted','f-why','f-pull-date']
-    .forEach(id => document.getElementById(id).value = '');
+  // clear all dropdown selections
+  FILTER_COLS.forEach(([, colKey]) => {
+    if (!colKey) return;
+    if (selectedValues[colKey]) selectedValues[colKey].clear();
+    document.querySelectorAll(`#dd-items-${colKey} .dd-item input`).forEach(cb => {
+      cb.checked = false;
+      cb.closest('.dd-item').classList.remove('checked');
+    });
+    updateBtnLabel(colKey);
+  });
+  // reset status filter
   activeStatusFilter = 'all';
-  document.querySelectorAll('#controls button').forEach(b => b.classList.remove('active'));
-  document.querySelector('#controls button').classList.add('active');
+  document.querySelectorAll('#controls button:not(.clear-btn)').forEach(b => b.classList.remove('active'));
+  document.querySelector('#controls button:not(.clear-btn)').classList.add('active');
   applyFilters();
 }
 
 function updateStats() {
-  const rows = document.querySelectorAll('#job-body tr');
-  const visible = [...rows].filter(r => !r.classList.contains('hidden'));
-  const statuses = [...rows].map(r => r.dataset.status);
-
+  const rows = [...document.querySelectorAll('#job-body tr')];
+  const visible = rows.filter(r => !r.classList.contains('hidden'));
+  const statuses = rows.map(r => r.dataset.status);
   document.getElementById('stat-total').textContent = rows.length;
   document.getElementById('stat-showing').textContent = visible.length;
   document.getElementById('stat-applied').textContent = statuses.filter(s => s === 'applied').length;
@@ -395,7 +595,7 @@ function updateStats() {
   document.getElementById('stat-offers').textContent = statuses.filter(s => s === 'offer received').length;
 }
 
-// --- Load ---
+/* ── Load ── */
 async function load() {
   try {
     const res = await fetch(CSV_URL + '?t=' + Date.now());
@@ -409,10 +609,13 @@ async function load() {
 
     document.getElementById('loading').style.display = 'none';
     document.getElementById('job-table').style.display = 'table';
+
     render(allRows);
+    buildFilters();
     applyFilters();
   } catch (e) {
-    document.getElementById('loading').textContent = 'Error loading data. Make sure the GitHub repo is public. (' + e.message + ')';
+    document.getElementById('loading').textContent =
+      'Error loading data. Make sure the GitHub repo is public. (' + e.message + ')';
   }
 }
 
