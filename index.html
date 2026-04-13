@@ -186,6 +186,8 @@
     tbody tr { border-bottom: 1px solid #f1f5f9; }
     tbody tr:hover { background: #f8fafc; }
     tbody tr.hidden { display: none; }
+    tbody tr.applied-highlight { background: #dcfce7 !important; }
+    tbody tr.applied-highlight:hover { background: #bbf7d0 !important; }
 
     td { padding: 10px 12px; vertical-align: top; line-height: 1.4; }
     td.title      { font-weight: 500; min-width: 180px; }
@@ -303,6 +305,7 @@ const STATUS_CLASS = {
 };
 
 // column config: [label, dataset key, csv key]
+// csv key = null for Status (uses STATUS_OPTIONS) and Apply (no filter)
 const FILTER_COLS = [
   ['Job Title',    'title',      'Job Title'],
   ['Company',      'company',    'Company'],
@@ -312,11 +315,10 @@ const FILTER_COLS = [
   [null,           null,         null],        // Apply — no filter
   ['Why It Matches','why',       'Why It Matches'],
   ['Pull Date',    'pullDate',   'Pull Date'],
-  [null,           null,         null],        // Status — handled by top buttons
+  ['Status',       'status',     null],        // uses STATUS_OPTIONS
 ];
 
 let allRows = [];
-let activeStatusFilter = 'all';
 // selectedValues[colKey] = Set of selected values (empty = all)
 const selectedValues = {};
 
@@ -362,10 +364,18 @@ function buildFilters() {
   FILTER_COLS.forEach(([label, colKey, csvKey], i) => {
     const th = cells[i];
     th.innerHTML = '';
-    if (!colKey) return; // Apply / Status columns
+    if (!colKey) return; // Apply column — no filter
 
-    // collect unique values for this column
-    const vals = [...new Set(allRows.map(r => (r[csvKey] || '').trim()))].filter(Boolean).sort();
+    // collect values: Status uses STATUS_OPTIONS (lowercase), others use lowercased unique CSV values
+    let vals, displayLabels;
+    if (colKey === 'status') {
+      vals = STATUS_OPTIONS.map(s => s.toLowerCase());
+      displayLabels = STATUS_OPTIONS; // proper-case labels
+    } else {
+      const rawVals = [...new Set(allRows.map(r => (r[csvKey] || '').trim()))].filter(Boolean).sort();
+      vals = rawVals.map(v => v.toLowerCase());
+      displayLabels = rawVals;
+    }
     selectedValues[colKey] = selectedValues[colKey] || new Set();
 
     const wrap = document.createElement('div');
@@ -391,18 +401,18 @@ function buildFilters() {
     // items
     const itemsDiv = document.createElement('div');
     itemsDiv.id = `dd-items-${colKey}`;
-    vals.forEach(val => {
+    vals.forEach((val, idx) => {
       const item = document.createElement('label');
       item.className = 'dd-item';
-      item.dataset.val = val.toLowerCase();
+      item.dataset.val = val; // already lowercase for status; raw for others
       const cb = document.createElement('input');
       cb.type = 'checkbox';
       cb.value = val;
-      cb.checked = selectedValues[colKey].has(val.toLowerCase());
+      cb.checked = selectedValues[colKey].has(val);
       if (cb.checked) item.classList.add('checked');
-      cb.onchange = () => onCheckChange(colKey, val.toLowerCase(), cb.checked, item);
+      cb.onchange = () => onCheckChange(colKey, val, cb.checked, item);
       item.appendChild(cb);
-      item.appendChild(document.createTextNode(val));
+      item.appendChild(document.createTextNode(displayLabels[idx]));
       itemsDiv.appendChild(item);
     });
     menu.appendChild(itemsDiv);
@@ -445,6 +455,11 @@ function onCheckChange(colKey, val, checked, item) {
   else selectedValues[colKey].delete(val);
   item.classList.toggle('checked', checked);
   updateBtnLabel(colKey);
+  // if Status dropdown changed, sync quick-filter buttons to "All" (deselect any active)
+  if (colKey === 'status') {
+    document.querySelectorAll('#controls button:not(.clear-btn)').forEach(b => b.classList.remove('active'));
+    document.querySelector('#controls button:not(.clear-btn)').classList.add('active');
+  }
   applyFilters();
 }
 
@@ -504,6 +519,7 @@ function render(rows) {
     tr.dataset.why        = (row['Why It Matches'] || '').toLowerCase();
     tr.dataset.pullDate   = (row['Pull Date'] || '').toLowerCase();
     tr.dataset.status     = status;
+    if (status === 'applied') tr.classList.add('applied-highlight');
 
     const link = row['Application Link'] || '';
     const linkCell = link ? `<a href="${link}" target="_blank" rel="noopener">Apply ↗</a>` : '—';
@@ -532,8 +548,11 @@ function render(rows) {
 function onStatusChange(sel, key) {
   const val = sel.value;
   saveStatus(key, val);
-  sel.className = STATUS_CLASS[val.toLowerCase()] || '';
-  sel.closest('tr').dataset.status = val.toLowerCase();
+  const lower = val.toLowerCase();
+  sel.className = STATUS_CLASS[lower] || '';
+  const tr = sel.closest('tr');
+  tr.dataset.status = lower;
+  tr.classList.toggle('applied-highlight', lower === 'applied');
   applyFilters();
 }
 
@@ -541,33 +560,37 @@ function onStatusChange(sel, key) {
 function applyFilters() {
   let visibleCount = 0;
   document.querySelectorAll('#job-body tr').forEach(tr => {
-    // dropdown column filters (OR within column)
-    const colMatch = FILTER_COLS.every(([, colKey]) => {
+    const visible = FILTER_COLS.every(([, colKey]) => {
       if (!colKey) return true;
       const sel = selectedValues[colKey];
       if (!sel || sel.size === 0) return true;
       return sel.has(tr.dataset[colKey]);
     });
-
-    const statusMatch = activeStatusFilter === 'all' || tr.dataset.status === activeStatusFilter;
-    const visible = colMatch && statusMatch;
     tr.classList.toggle('hidden', !visible);
     if (visible) visibleCount++;
   });
-
   document.getElementById('no-results').style.display = visibleCount === 0 ? 'block' : 'none';
   updateStats();
 }
 
 function filterStatus(status, btn) {
-  activeStatusFilter = status;
   document.querySelectorAll('#controls button:not(.clear-btn)').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  // sync to Status column dropdown
+  selectedValues['status'] = selectedValues['status'] || new Set();
+  selectedValues['status'].clear();
+  document.querySelectorAll('#dd-items-status .dd-item').forEach(item => {
+    const cb = item.querySelector('input');
+    const match = status !== 'all' && item.dataset.val === status;
+    cb.checked = match;
+    item.classList.toggle('checked', match);
+    if (match) selectedValues['status'].add(status);
+  });
+  updateBtnLabel('status');
   applyFilters();
 }
 
 function clearAllFilters() {
-  // clear all dropdown selections
   FILTER_COLS.forEach(([, colKey]) => {
     if (!colKey) return;
     if (selectedValues[colKey]) selectedValues[colKey].clear();
@@ -577,8 +600,7 @@ function clearAllFilters() {
     });
     updateBtnLabel(colKey);
   });
-  // reset status filter
-  activeStatusFilter = 'all';
+  // reset status quick-filter buttons to "All"
   document.querySelectorAll('#controls button:not(.clear-btn)').forEach(b => b.classList.remove('active'));
   document.querySelector('#controls button:not(.clear-btn)').classList.add('active');
   applyFilters();
