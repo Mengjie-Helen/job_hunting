@@ -519,6 +519,8 @@ function render(rows) {
     tr.dataset.why        = (row['Why It Matches'] || '').toLowerCase();
     tr.dataset.pullDate   = (row['Pull Date'] || '').toLowerCase();
     tr.dataset.status     = status;
+    tr.dataset.link       = row['Application Link'] || '';
+    tr.dataset.jobTitle   = row['Job Title'] || '';
     if (status === 'applied') tr.classList.add('applied-highlight');
 
     const link = row['Application Link'] || '';
@@ -537,7 +539,7 @@ function render(rows) {
       <td class="link">${linkCell}</td>
       <td class="why">${row['Why It Matches'] || ''}</td>
       <td class="pull-date">${row['Pull Date'] || ''}</td>
-      <td class="status"><select class="${statusClass}" onchange="onStatusChange(this, '${key.replace(/'/g,"\\'")}'">${opts}</select></td>
+      <td class="status"><select class="${statusClass}" onchange="onStatusChange(this)">${opts}</select></td>
     `;
     tbody.appendChild(tr);
   });
@@ -545,12 +547,13 @@ function render(rows) {
   updateStats();
 }
 
-function onStatusChange(sel, key) {
+function onStatusChange(sel) {
+  const tr = sel.closest('tr');
+  const key = (tr.dataset.link || '') + '||' + (tr.dataset.jobTitle || '');
   const val = sel.value;
   saveStatus(key, val);
   const lower = val.toLowerCase();
   sel.className = STATUS_CLASS[lower] || '';
-  const tr = sel.closest('tr');
   tr.dataset.status = lower;
   tr.classList.toggle('applied-highlight', lower === 'applied');
   applyFilters();
